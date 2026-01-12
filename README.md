@@ -6,7 +6,7 @@
 ![Linux](https://img.shields.io/badge/Linux-Shell-yellow?style=for-the-badge&logo=linux&logoColor=black)
 ![Status](https://img.shields.io/badge/Status-Activo-green?style=for-the-badge)
 
-> **"De la Terminal al Campo."**  
+> **"De la Terminal al Campo."**
 > Curso intensivo para transformar datos agroambientales y agroindustriales en decisiones automatizadas usando ingeniería de datos, HPC, ML/DL y despliegue.
 
 ---
@@ -62,7 +62,7 @@ Ejes de aplicación (casos por carrera):
 2. En la terminal, verifica:
    ```bash
    python --version
-  
+
 ---
 
 ## Opción B: Local (Linux)
@@ -71,5 +71,48 @@ Requisitos: Docker + VS Code + extensión “Dev Containers”.
 1. Abre el repo en VS Code.
 2. Ejecuta: Dev Containers: Reopen in Container.
 
+Opción B: Local (Linux/WSL)
+Requisitos: Docker + VS Code + extensión "Dev Containers".
+
+Clona el repo:
+
+```bash
+
+git clone https://github.com/asoleal/curso-ia-agroindustria-2.git
+cd curso-ia-agroindustria-2
+```
+
+Abre en VS Code y ejecuta: Dev Containers: Reopen in Container.
+
+Elige configuración:
+
+Agro-IA (rapido): para talleres/notebooks (default).
+
+Agro-IA (full-docs): cuando necesites compilar PDFs con LaTeX.
+
+## 📂 Estructura del repositorio
+```text
+curso-ia-agroindustria-2/
+├─ docs/
+│  ├─ manual/                 # Manuales LaTeX por semana
+│  └─ slides/                 # Presentaciones
+├─ talleres/                  # Práctica guiada (starter code + README)
+├─ entregables/               # Actividades evaluables
+├─ cases/                     # Casos por carrera (datasets + contexto)
+├─ data/                      # Datos (no se versiona raw/)
+├─ notebooks/                 # Jupyter exploratorios
+├─ src/                       # Código reusable
+└─ scripts/                   # Automatización
+```
+
+### 📖 Semana 1 (arranque)
+* Manual: docs/manual/semana01/manual_semana01.tex
+
+* Taller: talleres/week01_linux_git/
+
+* Entregable: entregables/A1_bash_git/
+
 ## 📄 Licencia
-MIT (material académico).
+
+MIT (material académico). Ver LICENSE.
+

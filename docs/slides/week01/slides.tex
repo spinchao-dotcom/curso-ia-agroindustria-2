@@ -1,0 +1,242 @@
+\documentclass[aspectratio=169,11pt]{beamer}
+
+% Beamer base (estructura de frames, títulos, etc.) [web:168]
+\usetheme{Madrid} % Tema común y legible [web:168]
+\usecolortheme{beaver}
+
+\usepackage[spanish]{babel}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{xcolor}
+\usepackage{listings}
+
+% =========================
+% Estilo de código (bash)
+% =========================
+\definecolor{terminalbg}{RGB}{28, 28, 28}
+\definecolor{terminalfg}{RGB}{135, 255, 0}
+
+\lstdefinestyle{bashstyle}{
+  backgroundcolor=\color{terminalbg},
+  basicstyle=\ttfamily\scriptsize\color{terminalfg},
+  breaklines=true,
+  language=bash,
+  showstringspaces=false,
+  keywordstyle=\color{cyan},
+  commentstyle=\color{gray!70}\itshape
+}
+
+% =========================
+% Metadata
+% =========================
+\title[Semana 1]{Semana 1: El Entorno del Ingeniero}
+\subtitle{Linux \,|\, Bash \,|\, Pipes \,|\, awk \,|\, Git}
+\author{Curso IA Agroindustria}
+\date{Enero 2026}
+\institute{Repositorio: \texttt{curso-ia-agroindustria-2}}
+
+\begin{document}
+
+% =========================
+% Portada
+% =========================
+\begin{frame}
+  \titlepage
+\end{frame}
+
+% =========================
+% Agenda
+% =========================
+\begin{frame}[fragile]{Agenda}
+\begin{itemize}
+\item Objetivo de la semana y criterio de éxito.
+\item Terminal: navegar, organizar proyectos, inspeccionar datos.
+\item Pipes y \texttt{awk}: mini-pipelines para CSV.
+\item Git: bitácora científica (commits + .gitignore).
+\item Entregable A1: script reproducible + repo en GitHub.
+\end{itemize}
+\end{frame}
+
+% =========================
+% Objetivo
+% =========================
+\begin{frame}[fragile]{Objetivo (en 1 frase)}
+Al final de la semana podrás tomar un dataset en CSV, inspeccionarlo, validar calidad básica, automatizar un reporte y versionarlo con Git.
+\end{frame}
+
+% =========================
+% Estructura proyecto
+% =========================
+\begin{frame}[fragile]{Estructura mínima de proyecto}
+\begin{block}{Convención recomendada}
+\begin{itemize}
+\item \texttt{data/raw}: datos originales (no se versionan).
+\item \texttt{data/processed}: datos listos para análisis.
+\item \texttt{scripts}: automatización (bash/python).
+\item \texttt{reports}: salidas (txt, tablas, figuras).
+\end{itemize}
+\end{block}
+
+\begin{lstlisting}[style=bashstyle]
+mkdir -p proyecto_ia/{data/raw,data/processed,scripts,reports}
+\end{lstlisting}
+\end{frame}
+
+% =========================
+% Terminal esencial
+% =========================
+\begin{frame}[fragile]{Terminal esencial (mínimo viable)}
+\begin{columns}
+\column{0.55\textwidth}
+\begin{itemize}
+\item \texttt{pwd}, \texttt{ls -lh}, \texttt{cd}
+\item \texttt{mkdir -p}, \texttt{cp}, \texttt{mv}, \texttt{rm -i}
+\item \texttt{find}, \texttt{du -sh}, \texttt{df -h}
+\end{itemize}
+
+\column{0.45\textwidth}
+\begin{lstlisting}[style=bashstyle]
+pwd
+ls -lh
+cd proyecto_ia
+mkdir -p data/raw
+find . -name "*.csv"
+du -sh data/*
+\end{lstlisting}
+\end{columns}
+\end{frame}
+
+% =========================
+% Inspección CSV
+% =========================
+\begin{frame}[fragile]{Inspección rápida de CSV}
+\begin{itemize}
+\item Ver encabezado y muestra: \texttt{head}.
+\item Ver últimas filas: \texttt{tail}.
+\item Contar registros: \texttt{wc -l}.
+\item Navegar sin abrir Excel: \texttt{less}.
+\end{itemize}
+
+\begin{lstlisting}[style=bashstyle]
+head -n 5 data/raw/sensores.csv
+tail -n 5 data/raw/sensores.csv
+wc -l data/raw/sensores.csv
+less data/raw/sensores.csv
+\end{lstlisting}
+\end{frame}
+
+% =========================
+% Calidad de datos
+% =========================
+\begin{frame}[fragile]{Señales de mala calidad (rápidas)}
+\begin{itemize}
+\item Faltantes típicos: \texttt{,,}
+\item Codificación rara / caracteres no ASCII.
+\item Columnas inconsistentes (separador incorrecto).
+\end{itemize}
+
+\begin{lstlisting}[style=bashstyle]
+grep ",," data/raw/sensores.csv | head
+grep -P "[^\x00-\x7F]" data/raw/sensores.csv | head
+\end{lstlisting}
+\end{frame}
+
+% =========================
+% Pipes
+% =========================
+\begin{frame}[fragile]{Pipes: entrada \textrightarrow proceso \textrightarrow salida}
+\begin{itemize}
+\item El pipe (\texttt{|}) conecta comandos: salida de A \(\rightarrow\) entrada de B.
+\item Construye pipelines sencillos y potentes sin abrir Python.
+\end{itemize}
+
+\begin{lstlisting}[style=bashstyle]
+# Frecuencia por sensor (col 1)
+cut -d',' -f1 data/raw/sensores.csv | sort | uniq -c | sort -nr | head
+\end{lstlisting}
+\end{frame}
+
+% =========================
+% awk
+% =========================
+\begin{frame}[fragile]{awk: estadísticas rápidas en columnas}
+\begin{lstlisting}[style=bashstyle]
+# Promedio temperatura (col 3)
+awk -F',' '{s+=$3} END {print "Temp_prom:", s/NR}' data/raw/sensores.csv
+
+# Max humedad (col 4) ignorando header
+awk -F',' 'NR>1 {if($4>max) max=$4} END {print "Hum_max:", max}' \
+  data/raw/sensores.csv
+\end{lstlisting}
+
+\begin{block}{Idea}
+\texttt{awk} es ideal para validaciones rápidas antes de cargar datos en pandas.
+\end{block}
+\end{frame}
+
+% =========================
+% Git básico
+% =========================
+\begin{frame}[fragile]{Git como bitácora científica}
+\begin{itemize}
+\item Un commit es un “fotograma” del proyecto.
+\item Commits pequeños + mensajes claros = reproducibilidad y auditoría.
+\item \texttt{.gitignore} evita subir datos brutos y basura.
+\end{itemize}
+
+\begin{lstlisting}[style=bashstyle]
+git init
+git add .
+git commit -m "feat: estructura inicial"
+git status
+git log --oneline --graph
+\end{lstlisting}
+\end{frame}
+
+% =========================
+% .gitignore
+% =========================
+\begin{frame}[fragile]{.gitignore mínimo para la semana 1}
+\begin{lstlisting}[style=bashstyle]
+cat > .gitignore << EOF
+data/raw/
+__pycache__/
+.ipynb_checkpoints/
+*.log
+*.tmp
+EOF
+\end{lstlisting}
+\end{frame}
+
+% =========================
+% Entregable A1
+% =========================
+\begin{frame}[fragile]{Entregable A1 (qué se entrega)}
+\begin{enumerate}
+\item Repo con estructura \texttt{data/ scripts/ reports/}.
+\item \texttt{scripts/setup\_proyecto.sh} idempotente.
+\item \texttt{reports/validacion\_inicial.txt} generado por el script.
+\item Al menos 3 commits con mensajes tipo \texttt{feat:/docs:/fix:}.
+\end{enumerate}
+\end{frame}
+
+% =========================
+% Checklist final
+% =========================
+\begin{frame}[fragile]{Checklist (si esto funciona, pasaste la semana)}
+\begin{itemize}
+\item Puedes navegar y organizar proyectos solo con terminal.
+\item Puedes inspeccionar CSV y detectar problemas básicos.
+\item Puedes construir un pipeline con \texttt{cut | sort | uniq} o \texttt{awk}.
+\item Puedes crear commits claros y usar \texttt{.gitignore}.
+\end{itemize}
+\end{frame}
+
+% =========================
+% Cierre
+% =========================
+\begin{frame}[fragile]{Siguiente semana}
+Semana 2: NumPy para alto rendimiento (vectorización, profiling, memoria).
+\end{frame}
+
+\end{document}
