@@ -13,7 +13,7 @@ Vas a ejecutar un script Bash que:
 
 Todo el trabajo es en esta carpeta:
 
-`talleres/week01_linux_git/workspace/`
+`talleres/talleres_semana_01/workspace/`
 
 No copies nada a la raíz del repo.
 
@@ -23,7 +23,7 @@ No copies nada a la raíz del repo.
 2) En la terminal, entra al workspace:
 
    ```bash
-   cd talleres/week01_linux_git/workspace
+   cd talleres/talleres_semana_01/workspace
    ```
 
 ## Ejecuta el script
@@ -41,14 +41,14 @@ cat reports/validacion_inicial.txt
 ## Haz commit y push
 
 ```bash
-git add talleres/week01_linux_git/workspace
+git add talleres/taller_semana_01/workspace
 git commit -m "feat: semana1 reporte validacion inicial"
 git push
 ```
 
 ## Criterios de éxito (DoD)
 
-* Existe talleres/week01_linux_git/workspace/reports/validacion_inicial.txt.
+* Existe talleres/taller_semana_01/workspace/reports/validacion_inicial.txt.
 
 * El script corre 2 veces seguidas sin fallar (idempotente).
 
@@ -62,4 +62,4 @@ Top 3 sensores con más registros (usa cut | sort | uniq -c | sort -nr | head -n
 
 # Ejercicio
 
-Realiza los ejercicios propuestos en el pdf, y deja evidencia del trabajo en tu git en la carpeta `talleres/week01_linux_git/workspace`
+Realiza los ejercicios propuestos en el pdf, y deja evidencia del trabajo en tu git en la carpeta `talleres/taller_semana_01/workspace`
