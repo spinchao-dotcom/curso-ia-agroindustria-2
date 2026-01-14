@@ -158,7 +158,85 @@ sensor_id = "SENSOR_01"  # str
 alarma = hum < 40     # bool
 \end{lstlisting}
 
-\subsection{Control de flujo: decisiones y reglas}
+\section{Verificar y convertir tipos de datos en Python}
+
+En programación científica es fundamental asegurarse de que cada variable tenga el \textbf{tipo de dato} correcto (entero, número real, texto, etc.), especialmente antes de hacer cálculos o comparaciones.
+
+\subsection{Tipos básicos: \texttt{int}, \texttt{float}, \texttt{str}}
+
+En Python, los tipos más usados en este curso son:
+
+\begin{itemize}
+    \item \texttt{int}: números enteros, por ejemplo \texttt{3}, \texttt{-10}, \texttt{42}.
+    \item \texttt{float}: números reales (con decimales), por ejemplo \texttt{3.14}, \texttt{-0.5}, \texttt{25.0}.
+    \item \texttt{str}: cadenas de texto, por ejemplo \texttt{"Café"}, \texttt{"Zona Norte"}, \texttt{"25.0"}.
+\end{itemize}
+
+\subsection{Cómo saber de qué tipo es una variable}
+
+Python permite inspeccionar el tipo de una variable con la función \texttt{type()}:
+
+\begin{lstlisting}[language=Python, caption={Inspección de tipos de variables}]
+temperatura = 25.0
+parcela_id = "P001"
+cantidad_sacos = 30
+
+print(type(temperatura))   # <class 'float'>
+print(type(parcela_id))    # <class 'str'>
+print(type(cantidad_sacos))# <class 'int'>
+\end{lstlisting}
+
+Esto es útil para depurar errores cuando una operación no funciona como se esperaba.
+
+\subsection{Convertir entre tipos (casting)}
+
+Muchas veces los datos llegan como texto (\texttt{str}) desde un archivo CSV o desde la entrada del usuario, y es necesario convertirlos a número antes de operar.
+
+\begin{lstlisting}[language=Python, caption={Conversión de tipos}]
+valor_bruto = "28.5"   # Esto es texto, no un número
+
+temperatura = float(valor_bruto)  # str -> float
+sacos_str = "30"
+sacos = int(sacos_str)            # str -> int
+
+print(temperatura + 1.5)          # 30.0
+print(sacos + 5)                  # 35
+\end{lstlisting}
+
+Conversión típica en este curso:
+
+\begin{itemize}
+    \item \texttt{str} a \texttt{int}: \texttt{int("42")}.
+    \item \texttt{str} a \texttt{float}: \texttt{float("3.14")}.
+    \item Cualquier tipo a \texttt{str}: \texttt{str(25.0)}.
+\end{itemize}
+
+\subsection{Ejemplo aplicado al agro}
+
+Al leer un CSV con mediciones de parcelas, todas las columnas llegan como texto. Antes de tomar decisiones agronómicas, se convierten al tipo correcto:
+
+\begin{lstlisting}[language=Python, caption={Asegurar tipos correctos desde CSV}]
+fila = {
+    "parcela_id": "P010",
+    "temperatura_c": "29.7",
+    "humedad_suelo_pct": "38",
+    "ph": "5.4"
+}
+
+parcela_id = fila["parcela_id"]                 # str
+temperatura = float(fila["temperatura_c"])      # str -> float
+humedad = int(fila["humedad_suelo_pct"])        # str -> int
+ph = float(fila["ph"])                          # str -> float
+
+print(type(parcela_id))  # <class 'str'>
+print(type(temperatura)) # <class 'float'>
+print(type(humedad))     # <class 'int'>
+print(type(ph))          # <class 'float'>
+\end{lstlisting}
+
+Si se omite esta conversión, las comparaciones como \texttt{temperatura > 30} o \texttt{humedad < 40} pueden fallar o producir resultados incorrectos.
+
+\section{Control de flujo: decisiones y reglas}
 Las reglas agronómicas se expresan como condiciones:
 
 \begin{lstlisting}[language=Python, caption={Decisión simple con if/elif/else}]
@@ -198,7 +276,7 @@ row = {"id": "SENSOR_01", "temp": 24.2, "hum": 55}
 
 \textbf{Puente al manual:} el validador fail-fast trabaja sobre diccionarios así.
 
-\subsection{Funciones: empaquetar lógica reutilizable}
+\section{Funciones: empaquetar lógica reutilizable}
 Cuando una regla se repite, se convierte en función:
 
 \begin{lstlisting}[language=Python, caption={Función simple reutilizable}]
@@ -240,7 +318,7 @@ with open("sensores.csv", "r", encoding="utf-8") as f:
 
 \textbf{Puente al manual:} ese patrón es la base de la limpieza del CSV sucio y la escritura del CSV limpio.
 
-\subsection{Por qué NumPy: cuando el tamaño importa}
+\section{Por qué NumPy: cuando el tamaño importa}
 Python es excelente para lógica, pero un \texttt{for} ejecuta iteración por iteración en el intérprete.
 NumPy permite operar con arreglos completos de números de forma eficiente (operaciones implementadas en bajo nivel).
 
@@ -335,7 +413,7 @@ primera_col = humedad[:, 0]           # 100 valores
 En NumPy, el orden es \texttt{[filas, columnas]}.
 \end{warningbox}
 
-\subsection{Vectorización con ufuncs: ``sin for''}
+\section{Vectorización con ufuncs: ``sin for''}
 Las operaciones element-wise (por elemento) se aplican a todo el array:
 \begin{lstlisting}[language=Python, caption={Ufuncs: operaciones vectorizadas}]
 import numpy as np
@@ -574,7 +652,7 @@ Al terminar, debes tener:
 \newpage
 
 % =====================================================
-\section{Capítulo I: Programación defensiva (Fail Fast)}
+\section{Capítulo II: Programación defensiva (Fail Fast)}
 
 \subsection{Por qué esto es ingeniería}
 Un sensor puede fallar. Un archivo puede venir mal. Un dato puede ser imposible.
@@ -684,7 +762,7 @@ Modifica el validador para aceptar \texttt{hum} como string numérico (por ejemp
 \newpage
 
 % =====================================================
-\section{Capítulo II: CSV sucio \texorpdfstring{\(\rightarrow\)}{->} CSV limpio (sin pandas)}
+\section{Capítulo III: CSV sucio \texorpdfstring{\(\rightarrow\)}{->} CSV limpio (sin pandas)}
 \subsection{Por qué sin pandas}
 En esta semana, el objetivo es entender el pipeline y las validaciones sin ``magia''.
 
@@ -849,7 +927,7 @@ Extiende \texttt{parse\_row()} para registrar también un error cuando la fecha 
 \newpage
 
 % =====================================================
-\section{Capítulo III: HPC con NumPy — benchmark (loop vs vectorización)}
+\section{Capítulo IV: HPC con NumPy — benchmark (loop vs vectorización)}
 
 \subsection{Por qué medir}
 Si no mides, solo estás adivinando.
@@ -1004,23 +1082,102 @@ Registra 2 configuraciones y compáralas en tu PDF.
 \newpage
 
 % =====================================================
-\section{Capítulo V: Reporte en LaTeX (manual en Semana 2)}
+\section{Introducción a LaTeX: Documentos Profesionales en Ingeniería}
 
-\begin{conceptbox}{Qué debe incluir tu PDF (1 página)}
+A partir de esta semana, entregarás tus reportes en \textbf{LaTeX} en lugar de editores visuales como Word o Google Docs. ¿Por qué? Porque LaTeX es el estándar en publicaciones científicas, ingeniería y documentación técnica.
+
+\subsection{¿Qué es LaTeX?}
+
+LaTeX es un \textit{sistema de composición de documentos} basado en texto plano. A diferencia de los editores "WYSIWYG" (What You See Is What You Get), en LaTeX \textbf{describes} cómo debe verse el documento mediante comandos, y el sistema lo compila automáticamente en un PDF profesional.
+
+Piensa en LaTeX como \textbf{código para documentos}:
 \begin{itemize}
-\item Resumen (5--8 líneas).
-\item Resultados del benchmark (tiempos + speedup).
-\item Resultados del lote (porcentajes + agua total).
-\item Qué validaciones aplicaste y por qué.
+    \item Escribes instrucciones en un archivo \texttt{.tex} (texto plano).
+    \item El compilador \texttt{xelatex} o \texttt{pdflatex} las convierte en un PDF final.
+    \item El resultado es consistente, elegante y reproducible.
 \end{itemize}
-\end{conceptbox}
 
-\begin{agrobox}{Ejercicio 5 (entrega)}
-En \texttt{workspace/report/main.tex} completa tu reporte y compila:
-\begin{lstlisting}[language=bash]
-latexmk -xelatex -interaction=nonstopmode main.tex
+\subsection{LaTeX vs. Editores tradicionales}
+
+\begin{center}
+\begin{tabular}{@{}p{6cm}p{6cm}@{}}
+\toprule
+\textbf{Editor visual (Word/Docs)} & \textbf{LaTeX} \\
+\midrule
+Formato manual (click en cada elemento) & Formato automático por comandos \\
+Las fórmulas se descuadran al editar & Las fórmulas siempre quedan perfectas \\
+Referencias a figuras hay que actualizarlas a mano & Referencias se actualizan automáticamente \\
+Difícil versionar cambios & Compatible con Git (texto plano) \\
+Cada colaborador puede cambiar el formato & El formato es consistente por diseño \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\subsection{¿Por qué LaTeX en este curso?}
+
+En ingeniería de software e inteligencia artificial, necesitas documentar:
+\begin{itemize}
+    \item \textbf{Código fuente} con sintaxis resaltada.
+    \item \textbf{Fórmulas matemáticas} (como funciones de costo en Machine Learning).
+    \item \textbf{Tablas con resultados} de experimentos o datasets.
+    \item \textbf{Gráficos y diagramas} referenciados automáticamente.
+\end{itemize}
+
+LaTeX maneja todo esto de forma profesional y estandarizada. Además, tus reportes quedan \textbf{versionados en Git} junto con tu código, permitiendo rastrear cambios históricos.
+
+\subsection{Tu primer documento LaTeX}
+
+Un documento mínimo tiene esta estructura:
+
+\begin{lstlisting}[language=TeX, caption={Estructura básica de LaTeX}]
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+\usepackage[spanish]{babel}
+
+\title{Reporte de Análisis de Sensores}
+\author{Tu Nombre}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+\section{Introducción}
+Este reporte presenta el análisis de 1440 lecturas de sensores agrícolas.
+
+\section{Resultados}
+Se detectaron 3 periodos críticos de temperatura superior a 30°C.
+
+\end{document}
 \end{lstlisting}
-\end{agrobox}
+
+Al compilar con \texttt{xelatex reporte.tex}, obtienes un PDF profesional con:
+\begin{itemize}
+    \item Portada automática.
+    \item Numeración de secciones.
+    \item Márgenes, tipografía y espaciado estandarizados.
+\end{itemize}
+
+\subsection{Compilación en Codespaces}
+
+En tu entorno de desarrollo ejecutas:
+
+\begin{lstlisting}[language=bash]
+xelatex reporte.tex
+\end{lstlisting}
+
+Esto genera \texttt{reporte.pdf} junto con archivos auxiliares (\texttt{.aux}, \texttt{.log}). Solo el \texttt{.tex} y el \texttt{.pdf} se versiona en Git [web:41].
+
+\subsection{Ventajas para ingenieros de datos}
+
+\begin{itemize}
+    \item \textbf{Reproducibilidad}: El mismo \texttt{.tex} genera el mismo PDF en cualquier sistema.
+    \item \textbf{Versionamiento}: Git muestra cambios línea por línea en el código LaTeX.
+    \item \textbf{Automatización}: Puedes generar reportes desde scripts Python insertando resultados dinámicamente.
+    \item \textbf{Profesionalismo}: Papers académicos, tesis y documentación técnica usan LaTeX como estándar.
+\end{itemize}
+
+En las próximas semanas aprenderás a incluir tablas de resultados, ecuaciones de modelos y fragmentos de código Python en tus reportes LaTeX.
 
 \newpage
 
