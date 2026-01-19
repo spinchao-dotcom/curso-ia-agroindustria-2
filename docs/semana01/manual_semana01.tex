@@ -244,10 +244,19 @@ cd proyecto_ia
 touch notas_proyecto.md
 
 # Copiar un CSV de sensores al directorio raw
-cp ~/sensores.csv data/raw/sensores.csv
+cp ../data/raw/datos_sensores.csv data/raw/
+
+# Verificar que se copió
+ls data/raw/
+
+datos_sensores.csv
 
 # Renombrar el archivo de notas
 mv notas_proyecto.md README.md
+
+# Verificar el cambio
+ls
+README.md  data/  reports/  scripts/
 
 # Eliminar un archivo (con confirmación si usas alias de seguridad)
 rm data/raw/archivo_innecesario.csv
@@ -297,18 +306,62 @@ find . -name "*.csv"
 
 # Extraer la primera columna (por ejemplo, id_sensor) de un CSV
 cd data/raw
-cut -d',' -f1 sensores.csv | head
+cut -d',' -f1 datos_sensores.csv | head
 
-# Obtener lista única de sensores
-cut -d',' -f1 sensores.csv | sort | uniq | head
+sepal_length
+5.1
+4.9
+4.7
+4.6
+5.0
+5.4
+4.6
+5.0
+4.4
+
+# Obtener lista ordenada  y única de 10 sensores
+cut -d',' -f1 datos_sensores.csv | sort | uniq | head
+
+4.3
+4.4
+4.5
+4.6
+4.7
+4.8
+4.9
+5.0
+5.1
+5.2
 \end{lstlisting}
 
 \begin{agrobox}{Ejercicio aplicado (25 min)}
-Supón que \texttt{sensores.csv} tiene columnas \texttt{id\_sensor,fecha,temperatura,humedad}.
+Trabajaremos con el dataset \texttt{datos\_sensores.csv} (originalmente Iris), que contiene medidas morfológicas.
+Las columnas son: \texttt{sepal\_length, sepal\_width, petal\_length, petal\_width, species}.
+
 \begin{enumerate}
-\item Obtén la lista única de \texttt{id\_sensor} ordenada alfabéticamente.
-\item Cuenta cuántos registros totales tiene el archivo.
-\item Calcula cuántos registros hay por cada \texttt{id\_sensor} usando \texttt{sort | uniq -c}.
+    \item \textbf{Exploración Categórica:}
+    Obtén la lista única de especies (\texttt{species}, columna 5) y cuenta cuántos registros existen por cada una.
+    \begin{lstlisting}[style=bashstyle]
+# Pista: usa cut, sort y uniq -c
+tail -n +2 datos_sensores.csv | cut -d',' -f5 | ...
+    \end{lstlisting}
+
+    \item \textbf{Conteo Total:}
+    Verifica si el dataset está completo contando el número total de filas de datos (excluyendo el encabezado).
+
+    \item \textbf{Filtrado Numérico (Nuevo):}
+    Encuentra cuántas flores tienen un \texttt{petal\_length} (columna 3) mayor a 1.5 cm.
+    \begin{lstlisting}[style=bashstyle]
+# Pista: usa awk con una condición condicional
+awk -F',' '$3 > 1.5 {print $0}' datos_sensores.csv | wc -l
+    \end{lstlisting}
+
+    \item \textbf{Detección de Outliers (Reto):}
+    Identifica las 3 flores con el \texttt{sepal\_width} (columna 2) más grande de todo el archivo.
+    \begin{lstlisting}[style=bashstyle]
+# Pista: ordena numéricamente de forma descendente (sort -nr)
+tail -n +2 datos_sensores.csv | sort -t',' -k2 -nr | head -n 3
+    \end{lstlisting}
 \end{enumerate}
 \end{agrobox}
 
@@ -337,18 +390,50 @@ Comandos:
 \end{itemize}
 
 \begin{lstlisting}[style=bashstyle]
-# Ver las primeras líneas de sensores.csv
-cd proyecto_ia/data/raw
-head -n 5 sensores.csv
+# ================================
+# Inspección rápida del dataset
+# Archivo real: data/raw/datos_sensores.csv (tiene encabezado)
+# Columnas: sepal_length,sepal_width,petal_length,petal_width,species
+# ================================
 
-# Ver las últimas líneas (útil para ver fechas recientes)
-tail -n 5 sensores.csv
+# 0) (Recomendado) Ir a la raíz del repositorio para que las rutas funcionen
+cd ../../../../curso-ia-agroindustria-2/
 
-# Contar cuántos registros hay
-wc -l sensores.csv
+# 1) Ver el encabezado (nombres de columnas)
+head -n 1 data/raw/datos_sensores.csv
 
-# Navegar por el archivo (q para salir)
-less sensores.csv
+sepal_length,sepal_width,petal_length,petal_width,species
+
+# 2) Ver las primeras 5 líneas del archivo (incluye encabezado)
+head -n 5 data/raw/datos_sensores.csv
+
+sepal_length,sepal_width,petal_length,petal_width,species
+5.1,3.5,1.4,0.2,setosa
+4.9,3.0,1.4,0.2,setosa
+4.7,3.2,1.3,0.2,setosa
+4.6,3.1,1.5,0.2,setosa
+
+# 3) Ver las últimas 5 líneas (útil para validar que el archivo no está cortado)
+tail -n 5 data/raw/datos_sensores.csv
+
+6.7,3.0,5.2,2.3,virginica
+6.3,2.5,5.0,1.9,virginica
+6.5,3.0,5.2,2.0,virginica
+6.2,3.4,5.4,2.3,virginica
+5.9,3.0,5.1,1.8,virginica
+
+# 4) Contar líneas totales (incluye el encabezado)
+wc -l data/raw/datos_sensores.csv
+
+151 data/raw/datos_sensores.csv
+
+# 5) Contar registros "reales" (sin encabezado)
+tail -n +2 data/raw/datos_sensores.csv | wc -l
+
+150 
+
+# 6) Navegar por el archivo sin abrirlo en un editor (q para salir)
+less data/raw/datos_sensores.csv
 \end{lstlisting}
 
 \subsection{Datos Reales y Errores Comunes}
@@ -363,10 +448,10 @@ Los datos reales contienen errores:
 
 \begin{lstlisting}[style=bashstyle]
 # Buscar columnas vacías consecutivas ,, que pueden indicar datos faltantes
-grep ",," sensores.csv | head
+grep ",," data/raw/datos_sensores.csv | head
 
 # Detectar caracteres no ASCII (posibles errores de codificación)
-grep -P "[^\x00-\x7F]" sensores.csv | head
+grep -P "[^\x00-\x7F]" data/raw/datos_sensores.csv | head
 \end{lstlisting}
 
 \begin{warningbox}{Atención}
@@ -380,45 +465,66 @@ El operador \texttt{|} (pipe) conecta la salida de un comando con la entrada de 
 Permite encadenar operaciones simples para construir un procesamiento más complejo.
 
 \begin{lstlisting}[style=bashstyle]
-# Contar cuántas veces aparece cada id_sensor en el archivo
-cut -d',' -f1 sensores.csv | sort | uniq -c | sort -nr | head
+# Contar cuántas veces aparece un dato id_sensor en el archivo, conteo rápido de los 10 sensores más frecuentes
+cut -d',' -f1 data/raw/datos_sensores.csv | sort | uniq -c | sort -nr | head
+
+10 5.0
+ 9 6.3
+ 9 5.1
+ 8 6.7
+ 8 5.7
+ 7 6.4
+ 7 5.8
+ 7 5.5
+ 6 6.1
+ 6 6.0
 
 # Obtener los 10 valores de temperatura más altos registrados
-cut -d',' -f3 sensores.csv | sort -nr | head
+cut -d',' -f3 data/raw/datos_sensores.csv | sort -nr | head
 
 # Filtrar solo las líneas de un sensor específico y contarlas
-grep "SENSOR_05" sensores.csv | wc -l
+grep "setosa" data/raw/datos_sensores.csv | wc -l
+
 \end{lstlisting}
 
 \begin{agrobox}{Ejercicio de pipeline (30 min)}
-Construye un pipeline que:
+Construye un pipeline usando \texttt{cut}, \texttt{sort} y \texttt{head} para analizar las flores más grandes. El objetivo es:
+
 \begin{enumerate}
-\item Se quede solo con las columnas \texttt{id\_sensor,temperatura}.
-\item Ordene por temperatura descendente.
-\item Muestre las 5 mediciones más altas por pantalla.
+    \item Extraer solo las columnas de \textbf{especie} (columna 5) y \textbf{longitud del pétalo} (columna 3).
+    \item Ordenar los resultados por longitud de pétalo de forma \textbf{descendente} (de mayor a menor).
+    \item Mostrar en pantalla las \textbf{5 flores con los pétalos más largos} del dataset.
 \end{enumerate}
+
+\textbf{Comando esperado:}
+\begin{lstlisting}[style=bashstyle]
+# Pista: Recuerda que sort necesita saber qué columna usar (-k) o recibir solo los datos a ordenar
+cut -d',' -f5,3 data/raw/datos_sensores.csv | sort -t',' -k2 -nr | head -n 5
+\end{lstlisting}
 \end{agrobox}
 
 \subsection{Procesamiento con awk}
 
-\texttt{awk} es un mini-lenguaje para procesar texto y columnas; permite calcular estadísticas básicas directamente desde la terminal.
+\texttt{awk} es un mini-lenguaje potente para procesar columnas y calcular estadísticas sin abrir Excel. Vamos a usarlo para analizar las dimensiones de las flores.
 
 \begin{lstlisting}[style=bashstyle]
-# Calcular la temperatura promedio (suponiendo que está en la columna 3)
-awk -F',' '{s+=$3} END {print "Temperatura promedio:", s/NR}' sensores.csv
+# Calcular la longitud promedio del sépalo (columna 1)
+# NR = Número de Registro (filas totales procesadas)
+awk -F',' 'NR>1 {s+=$1} END {print "Longitud promedio sépalo:", s/(NR-1)}' data/raw/datos_sensores.csv
 
-# Calcular la humedad máxima (columna 4)
-awk -F',' 'NR>1 {if($4>max) max=$4} END {print "Humedad máxima:", max}' sensores.csv
+# Encontrar el ancho de pétalo máximo (columna 4)
+awk -F',' 'NR>1 {if($4>max) max=$4} END {print "Ancho máximo pétalo:", max}' data/raw/datos_sensores.csv
 
-# Filtrar solo filas con humedad menor a 30
-awk -F',' '$4 < 30 {print $0}' sensores.csv | head
+# Filtrar flores pequeñas: mostrar solo aquellas con largo de pétalo < 1.5 cm (columna 3)
+awk -F',' '$3 < 1.5 {print $0}' data/raw/datos_sensores.csv | head
 \end{lstlisting}
 
 \begin{agrobox}{Ejercicio con awk (30 min)}
+Usando el archivo \texttt{data/raw/datos\_sensores.csv}:
 \begin{enumerate}
-\item Usa \texttt{awk} para calcular la temperatura mínima.
-\item Calcula la suma total de registros donde \texttt{humedad < 40}.
-\item Guarda las filas con \texttt{humedad > 80} en un archivo \texttt{alertas\_humedad.csv}.
+    \item Usa \texttt{awk} para calcular el \textbf{promedio del ancho de sépalo} (columna 2).
+    \item Cuenta cuántas flores son de la especie \textbf{"virginica"} (columna 5).
+    \item Filtra todas las flores con \texttt{petal\_length > 5.0} y guarda esas filas en un nuevo archivo llamado \texttt{flores\_gigantes.csv}.
 \end{enumerate}
 \end{agrobox}
 
@@ -512,31 +618,38 @@ Para datos grandes, considera herramientas como Git LFS u otros almacenes extern
 
 \subsection{Flujo de Trabajo Básico}
 
+Vamos a simular un ciclo de desarrollo real: crear una nueva herramienta, verificarla y guardarla en el historial.
+
 \begin{lstlisting}[style=bashstyle]
-# Modificar un archivo (por ejemplo, agregar un script)
+# 1. Crear un nuevo script de validación
 echo "#!/bin/bash" > scripts/validar_datos.sh
-echo "wc -l data/raw/*.csv" >> scripts/validar_datos.sh
+echo "echo 'Contando filas en el dataset maestro...'" >> scripts/validar_datos.sh
+echo "wc -l data/raw/datos_sensores.csv" >> scripts/validar_datos.sh
+
+# 2. Hacerlo ejecutable
 chmod +x scripts/validar_datos.sh
 
-# Ver qué cambió
+# 3. Verificar qué ha cambiado en el proyecto
 git status
-git diff scripts/validar_datos.sh
+# (Debería mostrar scripts/validar_datos.sh como 'Untracked')
 
-# Registrar el cambio
+# 4. Guardar el cambio en el historial (Staging + Commit)
 git add scripts/validar_datos.sh
-git commit -m "feat: script de validación de registros"
+git commit -m "feat: agrega script para contar registros totales"
 
-# Ver historial
-git log --oneline --graph
+# 5. Visualizar la historia de cambios
+git log --oneline --graph --all
 \end{lstlisting}
 
 \begin{agrobox}{Ejercicio de Git (30 min)}
+Sigue estos pasos en tu terminal (asegúrate de estar en la raíz del proyecto):
 \begin{enumerate}
-\item Inicializa un repositorio en \texttt{proyecto\_ia}.
-\item Haz un commit inicial con la estructura de carpetas.
-\item Crea un script \texttt{scripts/resumen.sh} que cuente archivos CSV y haz commit.
-\item Modifica el README y haz otro commit con mensaje descriptivo.
-\item Usa \texttt{git log} para ver tu historial.
+    \item Crea un archivo nuevo \texttt{scripts/resumen.sh} que imprima las primeras 5 líneas de tus datos usando \texttt{head}.
+    \item Ejecuta \texttt{git status} para confirmar que Git detecta el archivo nuevo.
+    \item Añádelo al área de preparación con \texttt{git add scripts/resumen.sh}.
+    \item Haz un commit con el mensaje: \texttt{"feat: script para previsualizar datos"}.
+    \item Modifica el archivo \texttt{README.md} agregando una línea al final y haz un nuevo commit.
+    \item Usa \texttt{git log} para comprobar que tus 2 nuevos commits aparecen en la lista.
 \end{enumerate}
 \end{agrobox}
 
