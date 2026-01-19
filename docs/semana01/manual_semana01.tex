@@ -190,22 +190,22 @@ pwd
 
 # Listar el contenido de la carpeta actual
 ls -lh
-total 24K
--rw-rw-rw-  1 vscode root 1.1K Jan 19 02:25 LICENSE
--rw-rw-rw-  1 vscode root 4.6K Jan 19 02:25 README.md
-drwxrwxrwx+ 5 vscode root 4.0K Jan 19 02:25 docs
-drwxrwxrwx+ 2 vscode root 4.0K Jan 19 02:25 scripts
-drwxrwxrwx+ 4 vscode root 4.0K Jan 19 02:25 talleres
+total 28K
+-rw-rw-rw-  1 vscode root 1.1K Jan 19 03:22 LICENSE
+-rw-rw-rw-  1 vscode root 4.7K Jan 19 03:22 README.md
+drwxrwxrwx+ 5 vscode root 4.0K Jan 19 03:22 docs
+drwxrwxrwx+ 2 vscode root 4.0K Jan 19 03:22 reports
+drwxrwxrwx+ 2 vscode root 4.0K Jan 19 03:22 scripts
+drwxrwxrwx+ 4 vscode root 4.0K Jan 19 03:22 talleres
 
-# Crear la carpeta data y entrar en ella
-mkdir data
-cd data
-pwd
-/workspaces/curso-ia-agroindustria-2/data
+# Para crear los archivos con datos ejecuta el siguiente script:
+./scripts/setup_proyecto.sh
 
-# Listar solo archivos CSV
-ls *.csv
-sensores.csv resumen_mensual.csv
+# Se creó la carpeta data, así que vamos a listar solo archivos CSV
+ls data/raw/
+
+datos_sensores.csv
+
 \end{lstlisting}
 
 \begin{agrobox}{Ejercicio guiado (15 min)}
